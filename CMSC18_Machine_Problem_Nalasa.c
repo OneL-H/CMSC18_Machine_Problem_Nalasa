@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #define pi 3.141592654
 
 // geddit guys - none dimensional? not 0 dimensional because C wont let me do that?
@@ -29,48 +30,9 @@ int radius; // global radius variable so i dont need to keep passing it
 
 void draw_circle(char (*graph)[2*radius+1]);
 void draw_Graph(int radius, char graph[2*radius+1][2*radius+1]);
-
-void set_slope(line *segment){
-    printf("\nm = (%d - %d) / (%d - %d)", segment->endpoint_1.y, segment->endpoint_2.y, segment->endpoint_1.x, segment->endpoint_2.x);
-    segment->slope = (((float)segment->endpoint_1.y - (float)segment->endpoint_2.y) / ((float)segment->endpoint_1.x - (float)segment->endpoint_2.x));
-    printf(" = %f", segment->slope);
-}
-
-void draw_point(point *endpoint, char ch, char (*graph)[2*radius+1]){
-    printf("\nchanging %c at (%d, %d) to %c", *(*(graph + endpoint->x) + endpoint->y), endpoint->x, endpoint->y, ch);
-    // printf("\n(%d, %d)", endpoint.x, endpoint.y);
-    *(*(graph + endpoint->x) + endpoint->y) = ch;
-}
-
-    // since the slope has been predefined in the one-dimensional struct
-    // we can use the "point-slope form" of a line: (y - y1) = m(x - x1)
-    // rearranging to find y, we get: y = m(x - x1) + y1
-    // for x, its a bit more complicated than the circle y - y1 = mx - mx1
-    // mx = y - y1 + mx1 => x = (y - y1 + mx1) / m
-    // idk maybe we'll use differenct endpoints for x1 and y1 maybe that will improve 
-    // resolution
-
-void draw_line(line segment, char (*graph)[2*radius+1], char ch){
-    int start_x = segment.endpoint_1.x > segment.endpoint_2.x ? segment.endpoint_2.x : segment.endpoint_1.x;
-    int end_x = segment.endpoint_1.x < segment.endpoint_2.x ? segment.endpoint_2.x : segment.endpoint_1.x;
-
-    int start_y = segment.endpoint_1.y > segment.endpoint_2.y ? segment.endpoint_2.y : segment.endpoint_1.y;
-    int end_y = segment.endpoint_1.y < segment.endpoint_2.y ? segment.endpoint_2.y : segment.endpoint_1.y;
-
-    // pass 1: pass through the x values
-    for(int x = start_x; x < end_x+1; x++){
-        printf("\n(%d, %d)", x, (int)round(segment.slope*(start_x - x) + start_y));
-        *(*(graph + x) + (int)round(segment.slope*(start_x - x) + start_y)) = ch;
-    }
-
-    // pass 2: pass through the y values
-    if(segment.slope != 0){
-        for(int y = start_y; y < end_y+1; y++){
-            printf("\n(%d, %d)", (int)round((y - start_y + segment.slope*start_x) / segment.slope), y);
-            *(*(graph + (int)round((y - start_y + segment.slope*start_x) / segment.slope)) + y) = ch;
-        }
-    } // one line is straight so we dont touch that.
-}
+void draw_line(line segment, char (*graph)[2*radius+1], char ch);
+void set_slope(line *segment);
+void draw_point(point *endpoint, char ch, char (*graph)[2*radius+1]);
 
 int main(){
     
@@ -85,13 +47,13 @@ int main(){
     
     for(int y = 0; y < radius*2+1; y++){
         for(int x = 0; x < radius*2+1; x++){
-            graph[y][x] = '.';
+            graph[y][x] = ' ';
         }
     }
     
     draw_circle(graph);
 
-    draw_Graph(radius, graph);
+    // draw_Graph(radius, graph);
 
     point point_A, point_B, point_C, point_D, point_E;
     
@@ -104,23 +66,23 @@ int main(){
     
     point_A.x = (int)round(radius * cos(((base_angle) * pi) / 180) + radius);
     point_A.y = abs((int)round(radius * sin(((base_angle) * pi) / 180) - radius));
-    draw_point(&point_A, 'A', graph);
+    // draw_point(&point_A, 'A', graph);
     
     point_B.x = (int)round(radius * cos(((1*72 + base_angle) * pi) / 180) + radius);
     point_B.y = abs((int)round(radius * sin(((1*72 + base_angle) * pi) / 180) - radius));
-    draw_point(&point_B, 'B', graph);
+    // draw_point(&point_B, 'B', graph);
 
     point_C.x = (int)round(radius * cos(((2*72 + base_angle) * pi) / 180) + radius);
     point_C.y = abs((int)round(radius * sin(((2*72 + base_angle) * pi) / 180) - radius));
-    draw_point(&point_C, 'C', graph);
+    // draw_point(&point_C, 'C', graph);
 
     point_D.x = (int)round(radius * cos(((3*72 + base_angle) * pi) / 180) + radius);
     point_D.y = abs((int)round(radius * sin(((3*72 + base_angle) * pi) / 180) - radius));
-    draw_point(&point_D, 'D', graph);
+    // draw_point(&point_D, 'D', graph);
 
     point_E.x = (int)round(radius * cos(((4*72 + base_angle) * pi) / 180) + radius);
     point_E.y = abs((int)round(radius * sin(((4*72 + base_angle) * pi) / 180) - radius));
-    draw_point(&point_E, 'E', graph);
+    // draw_point(&point_E, 'E', graph);
     
     // draw_Graph(radius, graph);
 
@@ -152,11 +114,12 @@ int main(){
     // okay, so these are the endpoints of the star. we will basically do the same thing
     // with the circle but the formula is different this time.
     
-    draw_line(segment_AC, graph, 'A');
-    draw_line(segment_AD, graph, 'D');
-    draw_line(segment_BD, graph, 'B');
-    draw_line(segment_BE, graph, 'E');
-    draw_line(segment_CE, graph, 'C');
+    printf("\n(y+10)^{2}+(x-10)^{2}=100");
+    draw_line(segment_AC, graph, '#');
+    draw_line(segment_AD, graph, '#');
+    draw_line(segment_BD, graph, '#');
+    draw_line(segment_BE, graph, '#');
+    draw_line(segment_CE, graph, '#');
 
     draw_Graph(radius, graph);
 
@@ -184,6 +147,35 @@ void draw_circle(char (*graph)[2*radius+1]){
     } // p.s. oh wow yeah that worked really well
 }
 
+    // since the slope has been predefined in the one-dimensional struct
+    // we can use the "point-slope form" of a line: (y - y1) = m(x - x1)
+    // rearranging to find y, we get: y = m(x - x1) + y1
+    // for x, its a bit more complicated than the circle y - y1 = mx - mx1
+    // mx = y - y1 + mx1 => x = (y - y1 + mx1) / m
+    // idk maybe we'll use differenct endpoints for x1 and y1 maybe that will improve 
+    // resolution
+
+void draw_line(line segment, char (*graph)[2*radius+1], char ch){
+    
+    int increment_x = segment.endpoint_1.x < segment.endpoint_2.x ? 1 : -1;
+    int increment_y = segment.endpoint_1.y < segment.endpoint_2.y ? 1 : -1;
+    
+    // pass 1: pass through the x values
+    for(int x = segment.endpoint_1.x; x != segment.endpoint_2.x + increment_x; x+=increment_x){
+        // printf("\n(%d, -%d)", x, (int)round(segment.slope*(start_x - x) + start_y));
+        *(*(graph + x) + (int)round(segment.slope*(x - segment.endpoint_1.x) + segment.endpoint_1.y)) = ch;
+    }
+    
+    
+    // pass 2: pass through the y values
+    if(segment.slope != 0){
+        for(int y = segment.endpoint_1.y; y != segment.endpoint_2.y + increment_y; y+=increment_y){
+            // printf("\n(%d, -%d)", (int)round((y - start_y + segment.slope*start_x) / segment.slope), y);
+            *(*(graph + (int)round((y - segment.endpoint_1.y + segment.slope*segment.endpoint_1.x) / segment.slope)) + y) = ch;
+        }
+    } // one line is straight so we dont touch that.
+}
+
 void draw_Graph(int radius, char graph[2*radius+1][2*radius+1]){
     int y, x;
     for(y = 0; y<(2*radius+1); ++y){
@@ -192,4 +184,14 @@ void draw_Graph(int radius, char graph[2*radius+1][2*radius+1]){
             printf("%c", graph[x][y]);
         }
     }
+}
+
+void set_slope(line *segment){
+    segment->slope = (((float)segment->endpoint_1.y - (float)segment->endpoint_2.y) / ((float)segment->endpoint_1.x - (float)segment->endpoint_2.x));
+} // m = (y2 - y1) / (x2 - x1)
+
+void draw_point(point *endpoint, char ch, char (*graph)[2*radius+1]){
+    printf("\nchanging %c at (%d, %d) to %c", *(*(graph + endpoint->x) + endpoint->y), endpoint->x, endpoint->y, ch);
+    // printf("\n(%d, %d)", endpoint.x, endpoint.y);
+    *(*(graph + endpoint->x) + endpoint->y) = ch;
 }
