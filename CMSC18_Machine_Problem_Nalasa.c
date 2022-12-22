@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#define pi 3.141592654
 
 // geddit guys - none dimensional? not 0 dimensional because C wont let me do that?
 typedef struct none_dimensional{
@@ -17,41 +18,46 @@ typedef struct none_dimensional{
 typedef struct one_dimensional{
     point endpoint_1;
     point endpoint_2;
-    float slope = (endpoint_1.y - endpoint_2.y) / (endpoint_1.x - endpoint_2.x);
+    float slope;
 } line;
 
 int square(int i){
     return i*i;
 }
 
-int round_good(float f){
-    printf("%ld <- %f -> %ld", floor(f), f, ceil(f));
-    return ((f - floor(f)) < (ceil(f) - f)) ? floor(f) : ceil(f);
-}
+int radius;
 
-void draw_Graph(int radius, char graph[radius][radius]){
-    for(int y = 0; y < radius*2+1; y++){
+void draw_Graph(int radius, char graph[2*radius+1][2*radius+1]){
+    int y, x;
+    for(y = 0; y<(2*radius+1); ++y){
         printf("\n");
-        for(int x = 0; x < radius*2+1; x++){
-            printf("%c", graph[y][x]);
+        for(x = 0; x < radius*2+1; x++){
+            printf("%c", graph[x][y]);
         }
     }
 }
 
+void set_slope(line *segment){
+    segment->slope = (float)((segment->endpoint_1.y - segment->endpoint_2.y) / (segment->endpoint_1.x - segment->endpoint_2.x));
+}
+
+void draw_point(point endpoint, char ch, char graph [2*radius+1][2*radius+1]){
+    // printf("\nchanging %c at (%d, %d) to %c", graph[endpoint.y][endpoint.x], endpoint.x, endpoint.y, ch);
+    printf("\n(%d, %d)", endpoint.x, endpoint.y);
+    // graph[endpoint.y][endpoint.x] = ch;
+}
+
+
 int main(){
-
-    int radius;
-
+    
     printf("DRAW A PAROL WITH RADIUS X: A MACHINE PROBLEM SUBMISSION BY HASKEL NALASA\n");
-    printf(" NOT A PENTAGRAM DESPITE THEIR SIMILARITIES THIS IS A CHRISTMAS THEMED ASSIGNMENT\n");
-    printf("NOTE: RESOLUTION IMPROVES WITH INCREASING RADII???");
+    printf("(NOT A PENTAGRAM)\n");
+    printf("NOTE: RESOLUTION IMPROVES WITH INCREASING RADII???\n");
+    printf("USE LARGE SCREEN OR COPY-PASTE TO NOTEPAD WITH ZOOM OUT\n");
     printf("INPUT RADIUS (POSITIVE INTEGER): ");
     scanf("%d", &radius);
 
     char graph[2*radius+1][2*radius+1];
-    
-    graph[0][1] = '3';
-    printf("%c", graph[0][1]);
     
     for(int y = 0; y < radius*2+1; y++){
         for(int x = 0; x < radius*2+1; x++){
@@ -80,50 +86,73 @@ int main(){
         // printf("\n(%d, %d)", (int)round(radius - sqrt(square(radius) - square(y-radius))), y);
         graph[y][(int)round(radius + sqrt(square(radius) - square(y-radius)))] = '#';
         graph[y][(int)round(radius - sqrt(square(radius) - square(y-radius)))]= '#';
-    }
+    } // p.s. oh wow yeah that worked really well
     
-    for(int y = 0; y < radius*2+1; y++){
-        printf("\n");
-        for(int x = 0; x < radius*2+1; x++){
-            printf("%c", graph[y][x]);
-        }
-    }
+    draw_Graph(radius, graph);
+    
+    // uhh maam the reason these functions are all here is because i dont know how to pass
+    // by reference with a two-dimensional array
 
     point point_A, point_B, point_C, point_D, point_E;
-
-    point_A.x = (int)round(radius * cos(18) + radius);
-    point_A.y = (int)round(radius * sin(18) - radius);
-
-    point_B.x = (int)round(radius * cos(90) + radius);
-    point_B.y = (int)round(radius * sin(90) - radius);
-
-    point_C.x = (int)round(radius * cos(162) + radius);
-    point_C.y = (int)round(radius * sin(162) - radius);
-
-    point_D.x = (int)round(radius * cos(234) + radius);
-    point_D.y = (int)round(radius * sin(234) - radius);
-
-    point_E.x = (int)round(radius * cos(306) + radius);
-    point_E.y = (int)round(radius * sin(306) - radius);
+    
+    const int base_angle = 18;
+    
+    point points[5] = {point_A, point_B, point_C, point_D, point_E};
+    char letters[5] = {'A', 'B', 'C', 'D', 'E'};
+    for(int i = 0; i < 5; i++){
+        points[i].x = (int)round(radius * cos(((i*72 + base_angle) * pi) / 180) + radius);
+        points[i].y = (int)round(radius * sin(((i*72 + base_angle) * pi) / 180) + radius);
+        printf("\n%c (%d, %d)", letters[i], points[i].x, points[i].y);
+    }
+    /*for(int i = 0; i < 5; i++){
+        draw_point(points[i], letters[i], graph);
+    }*/
+    
+    
+    // draw_Graph(radius, graph);
 
     // endpoints of the star, 72 degrees apart, defined through pure math
+    // source: trust me bro i learned this in math20
 
     line segment_AC, segment_AD, segment_BD, segment_BE, segment_CE;
 
     segment_AC.endpoint_1 = point_A;
     segment_AC.endpoint_2 = point_C;
+    set_slope(&segment_AC);
     
     segment_AD.endpoint_1 = point_A;
     segment_AD.endpoint_2 = point_D;
+    set_slope(&segment_AD);
 
     segment_BD.endpoint_1 = point_B;
     segment_BD.endpoint_2 = point_D;
+    set_slope(&segment_BD);
 
     segment_BE.endpoint_1 = point_B;
     segment_BE.endpoint_2 = point_E;
+    set_slope(&segment_BE);
 
     segment_CE.endpoint_1 = point_C;
     segment_CE.endpoint_2 = point_E;
+    set_slope(&segment_CE);
+    
+    line segments[5] = {segment_AC, segment_AD, segment_BE, segment_CE, segment_BD};
+    /*
+    for(int i = 0; i < 5; i++){
+        draw_line(segments[i], );
+    }
+    */
+    // okay, so these are the endpoints of the star. we will basically do the same thing
+    // with the circle but the formula is different this time.
+    
+    // since the slope has been predefined in the one-dimensional struct
+    // we can use the "point-slope form" of a line: (y - y1) = m(x - x1)
+    // rearranging to find y, we get: y = m(x - x1) + y1
+    // for x, its a bit more complicated than the circle y - y1 = mx - mx1
+    // mx = y - y1 + mx1 => x = (y - y1 + mx1) / m
+    // idk maybe we'll use differenct endpoints for x1 and y1 maybe that will improve 
+    // resolution
+
 
     return 0;
 }
